@@ -14,9 +14,9 @@ set(CMAKE_AUTOMOC ON)
 include(GNUInstallDirs)
 
 if(NOT DEFINED QT_VERSION_MAJOR)
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui REQUIRED)
+    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core GuiPrivate REQUIRED)
 endif()
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core GuiPrivate REQUIRED)
 set(EXPORT_NAME QXlsxQt${QT_VERSION_MAJOR})
 
 if (QT_VERSION_MAJOR EQUAL 6)

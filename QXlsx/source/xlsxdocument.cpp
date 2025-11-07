@@ -565,7 +565,8 @@ bool DocumentPrivate::copyStyle(const QString &from, const QString &to)
 {
     // create a temp file because the zip writer cannot modify already existing zips
     QTemporaryFile tempFile;
-    tempFile.open();
+    if (!tempFile.open())
+        return false;
     tempFile.close();
     QString temFilePath = QFileInfo(tempFile).absoluteFilePath();
 
