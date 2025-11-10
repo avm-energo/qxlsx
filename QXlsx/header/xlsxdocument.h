@@ -7,7 +7,6 @@
 #include "xlsxglobal.h"
 #include "xlsxworksheet.h"
 
-#include <QIODevice>
 #include <QImage>
 #include <QObject>
 #include <QVariant>
@@ -32,7 +31,6 @@ class QXLSX_EXPORT Document : public QObject
 public:
     explicit Document(QObject *parent = nullptr);
     Document(const QString &xlsxName, QObject *parent = nullptr);
-    Document(QIODevice *device, QObject *parent = nullptr);
     ~Document();
 
     bool write(const CellReference &cell, const QVariant &value, const Format &format = Format());
@@ -116,7 +114,6 @@ public:
 
     bool save() const;
     bool saveAs(const QString &xlsXname) const;
-    bool saveAs(QIODevice *device) const;
 
     bool saveAsCsv(const QString mainCSVFileName) const;
 

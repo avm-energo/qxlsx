@@ -5,7 +5,6 @@
 #include "xlsxchart.h"
 #include "xlsxchartsheet.h"
 #include "xlsxformat.h"
-#include "xlsxformat_p.h"
 #include "xlsxmediafile_p.h"
 #include "xlsxsharedstrings_p.h"
 #include "xlsxstyles_p.h"

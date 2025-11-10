@@ -20,8 +20,8 @@ public:
     DocumentPrivate(Document *p);
     void init();
 
-    bool loadPackage(QIODevice *device);
-    bool savePackage(QIODevice *device) const;
+    bool loadPackage(const QString &fileName);
+    bool savePackage(const QString &fileName) const;
 
     bool saveCsv(const QString mainCSVFileName) const;
 

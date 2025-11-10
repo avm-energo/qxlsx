@@ -14,9 +14,9 @@ set(CMAKE_AUTOMOC ON)
 include(GNUInstallDirs)
 
 if(NOT DEFINED QT_VERSION_MAJOR)
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core GuiPrivate REQUIRED)
+    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui REQUIRED)
 endif()
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core GuiPrivate REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui REQUIRED)
 set(EXPORT_NAME QXlsxQt${QT_VERSION_MAJOR})
 
 if (QT_VERSION_MAJOR EQUAL 6)
@@ -131,6 +131,8 @@ set(QXLSX_PUBLIC_HEADERS
     header/xlsxworksheet.h
 )
 
+include(gen)
+
 add_library(QXlsx
     ${SRC_FILES}
     ${QXLSX_PUBLIC_HEADERS}
@@ -166,7 +168,8 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
    Qt${QT_VERSION_MAJOR}::Core
-   Qt${QT_VERSION_MAJOR}::GuiPrivate
+   Qt${QT_VERSION_MAJOR}::Gui
+   avm-gen
 )
 
 target_include_directories(QXlsx

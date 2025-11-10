@@ -168,10 +168,10 @@ void DocumentPrivate::init()
         workbook = QSharedPointer<Workbook>(new Workbook(Workbook::F_NewFromScratch));
 }
 
-bool DocumentPrivate::loadPackage(QIODevice *device)
+bool DocumentPrivate::loadPackage(const QString &fileName)
 {
     Q_Q(Document);
-    ZipReader zipReader(device);
+    ZipReader zipReader(fileName);
     QStringList filePaths = zipReader.filePaths();
 
     // Load the Content_Types file
@@ -322,11 +322,11 @@ bool DocumentPrivate::loadPackage(QIODevice *device)
     return true;
 }
 
-bool DocumentPrivate::savePackage(QIODevice *device) const
+bool DocumentPrivate::savePackage(const QString &fileName) const
 {
     Q_Q(const Document);
 
-    ZipWriter zipWriter(device);
+    ZipWriter zipWriter(fileName);
     if (zipWriter.error())
         return false;
 
@@ -670,31 +670,11 @@ Document::Document(const QString &name, QObject *parent)
     d_ptr->packageName = name;
 
     if (QFile::exists(name)) {
-        QFile xlsx(name);
-        if (xlsx.open(QFile::ReadOnly)) {
-            if (!d_ptr->loadPackage(&xlsx)) {
-                // NOTICE: failed to load package
-            }
-        }
-    }
-
-    d_ptr->init();
-}
-
-/*!
- * \overload
- * Try to open an existing xlsx document from \a device.
- * The \a parent argument is passed to QObject's constructor.
- */
-Document::Document(QIODevice *device, QObject *parent)
-    : QObject(parent)
-    , d_ptr(new DocumentPrivate(this))
-{
-    if (device && device->isReadable()) {
-        if (!d_ptr->loadPackage(device)) {
+        if (!d_ptr->loadPackage(name)) {
             // NOTICE: failed to load package
         }
     }
+
     d_ptr->init();
 }
 
@@ -1352,22 +1332,8 @@ bool Document::save() const
  */
 bool Document::saveAs(const QString &name) const
 {
-    QFile file(name);
-    if (file.open(QIODevice::WriteOnly))
-        return saveAs(&file);
-    return false;
-}
-
-/*!
- * \overload
- * This function writes a document to the given \a device.
- *
- * \warning The \a device will be closed when this function returned.
- */
-bool Document::saveAs(QIODevice *device) const
-{
     Q_D(const Document);
-    return d->savePackage(device);
+    return d->savePackage(name);
 }
 
 bool Document::saveAsCsv(const QString mainCSVFileName) const

@@ -2,19 +2,13 @@
 
 #include "xlsxzipreader_p.h"
 
-#include <private/qzipreader_p.h>
+#include <gen/files/ziputil.h>
 
 QT_BEGIN_NAMESPACE_XLSX
 
 ZipReader::ZipReader(const QString &filePath)
-    : m_reader(new QZipReader(filePath))
 {
-    init();
-}
-
-ZipReader::ZipReader(QIODevice *device)
-    : m_reader(new QZipReader(device))
-{
+    m_filePath = filePath;
     init();
 }
 
@@ -24,16 +18,12 @@ ZipReader::~ZipReader()
 
 void ZipReader::init()
 {
-    const auto &allFiles = m_reader->fileInfoList();
-    for (const auto &fi : allFiles) {
-        if (fi.isFile || (!fi.isDir && !fi.isFile && !fi.isSymLink))
-            m_filePaths.append(fi.filePath);
-    }
+    m_filePaths = ZipUtil::GetArchiveContentsList(m_filePath);
 }
 
 bool ZipReader::exists() const
 {
-    return m_reader->exists();
+    return true; // dummy for compatibility
 }
 
 QStringList ZipReader::filePaths() const
@@ -43,7 +33,7 @@ QStringList ZipReader::filePaths() const
 
 QByteArray ZipReader::fileData(const QString &fileName) const
 {
-    return m_reader->fileData(fileName);
+    return ZipUtil::DecompressFileToBA(m_filePath, fileName);
 }
 
 QT_END_NAMESPACE_XLSX
