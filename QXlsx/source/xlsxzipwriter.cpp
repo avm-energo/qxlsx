@@ -25,7 +25,7 @@ bool ZipWriter::error() const
 
 void ZipWriter::addFile(const QString &filePath, const QByteArray &data)
 {
-    ZipUtil::AddFile(m_zipFileName, filePath, data);
+    ZipUtil::getInstance().AddFile(m_zipFileName, filePath, data);
 }
 
 void ZipWriter::close()

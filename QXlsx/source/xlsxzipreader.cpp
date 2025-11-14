@@ -18,7 +18,7 @@ ZipReader::~ZipReader()
 
 void ZipReader::init()
 {
-    m_filePaths = ZipUtil::GetArchiveContentsList(m_filePath);
+    m_filePaths = ZipUtil::getInstance().GetArchiveContentsList(m_filePath);
 }
 
 bool ZipReader::exists() const
@@ -33,7 +33,7 @@ QStringList ZipReader::filePaths() const
 
 QByteArray ZipReader::fileData(const QString &fileName) const
 {
-    return ZipUtil::DecompressFileToBA(m_filePath, fileName);
+    return ZipUtil::getInstance().DecompressFileToBA(m_filePath, fileName);
 }
 
 QT_END_NAMESPACE_XLSX
