@@ -2,8 +2,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(QXlsx
-    VERSION 1.4.4
+project(avm-qxlsx
+    VERSION 2.0.1
     LANGUAGES CXX
 )
 
@@ -12,12 +12,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 if(NOT DEFINED QT_VERSION_MAJOR)
     find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui REQUIRED)
 endif()
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui REQUIRED)
-set(EXPORT_NAME QXlsxQt${QT_VERSION_MAJOR})
 
 if (QT_VERSION_MAJOR EQUAL 6)
     set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
@@ -26,7 +26,7 @@ else()
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if(NOT DEFINED QXLSX_PARENTPATH)
 	set(QXLSX_PARENTPATH ${CMAKE_CURRENT_SOURCE_DIR}/../)
@@ -39,9 +39,6 @@ endif()
 if(NOT DEFINED QXLSX_SOURCEPATH)
 	set(QXLSX_SOURCEPATH ${CMAKE_CURRENT_SOURCE_DIR}/../QXlsx/source/)
 endif()
-
-# Due historical reasons this value is kept off
-option(BUILD_SHARED_LIBS "Build in shared lib mode" OFF)
 
 set(SRC_FILES
     source/xlsxcellrange.cpp
@@ -131,16 +128,29 @@ set(QXLSX_PUBLIC_HEADERS
     header/xlsxworksheet.h
 )
 
-include(gen)
+find_package(avm-gen QUIET)
+if(${avm-gen_FOUND})
+  message(STATUS "Found package avm-gen")
+else()
+  include(gen)
+endif()
 
-add_library(QXlsx
-    ${SRC_FILES}
-    ${QXLSX_PUBLIC_HEADERS}
-)
+# Library building settings
+if(BUILD_SHARED_LIBS)
+    message(STATUS "${PROJECT_NAME} SHARED LIBRARY")
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${QXLSX_PUBLIC_HEADERS})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DAVM_EXPORTS)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE -DAVM_IMPORTS)
+else()
+    message(STATUS "${PROJECT_NAME} STATIC LIBRARY")
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${QXLSX_PUBLIC_HEADERS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC -DHAVE_STATIC_BUILD)
+endif()
 
-add_library(QXlsx::QXlsx ALIAS QXlsx)
+# Creating library target
+add_library(avm-energo::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_compile_definitions(QXlsx PRIVATE
+target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_NO_KEYWORDS
     QT_NO_CAST_TO_ASCII
     QT_NO_CAST_FROM_ASCII
@@ -157,62 +167,65 @@ if (NOT WIN32)
     # when application code iterates over a QVector<QPoint> for instance, unless
     # Qt itself was also built with strict iterators.
     # See example at https://bugreports.qt.io/browse/AUTOSUITE-946
-    target_compile_definitions(QXlsx PRIVATE QT_STRICT_ITERATORS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE QT_STRICT_ITERATORS)
 endif()
 
-target_compile_features(QXlsx INTERFACE cxx_std_11)
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
 
-if (BUILD_SHARED_LIBS)
-    target_compile_definitions(QXlsx PUBLIC QXlsx_SHAREDLIB)
-endif()
-
+# Set project version as qxlsx target property
 target_link_libraries(${PROJECT_NAME}
    Qt${QT_VERSION_MAJOR}::Core
    Qt${QT_VERSION_MAJOR}::Gui
    avm-gen
 )
 
-target_include_directories(QXlsx
+target_include_directories(${PROJECT_NAME}
 PRIVATE
     ${QXLSX_HEADERPATH}
 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/header>
-    $<INSTALL_INTERFACE:include/QXlsxQt${QT_VERSION_MAJOR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-set_target_properties(QXlsx PROPERTIES
-    OUTPUT_NAME ${EXPORT_NAME}
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION 0.${PROJECT_VERSION}
     PUBLIC_HEADER "${QXLSX_PUBLIC_HEADERS}"
 )
 
-install(TARGETS QXlsx
-    EXPORT ${EXPORT_NAME}Targets DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/QXlsxQt${QT_VERSION_MAJOR} COMPONENT devel
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}_Targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} COMPONENT devel
 )
 
-install(EXPORT ${EXPORT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${EXPORT_NAME}/
-    FILE ${EXPORT_NAME}Targets.cmake
-    NAMESPACE QXlsx::
+install(EXPORT ${PROJECT_NAME}_Targets
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
+    FILE ${PROJECT_NAME}Targets.cmake
+    NAMESPACE ${PROJECT_NAME}::
     COMPONENT devel
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/qxlsx-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_NAME}Config.cmake
-    @ONLY
-)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/qxlsx-config-version.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_NAME}ConfigVersion.cmake
-    @ONLY
-)
+# create version file for cmake project
+write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION
+    ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_NAME}Config.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_NAME}ConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${EXPORT_NAME}/
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
 )
-include(CPackConfig)
+
+set(VERSION_IN ${CMAKE_CURRENT_SOURCE_DIR}/VERSION.in)
+set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/package/src/VERSION)
+configure_file(${VERSION_IN} ${VERSION_OUT} @ONLY)
