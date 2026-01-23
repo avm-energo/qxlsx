@@ -164,7 +164,10 @@ endif()
 target_compile_features(QXlsx INTERFACE cxx_std_11)
 
 if (BUILD_SHARED_LIBS)
+    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} has to be built as SHARED library")
     target_compile_definitions(QXlsx PUBLIC QXlsx_SHAREDLIB)
+else()
+    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} STATIC library")
 endif()
 
 target_link_libraries(${PROJECT_NAME}
