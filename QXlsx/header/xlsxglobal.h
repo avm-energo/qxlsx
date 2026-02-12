@@ -15,12 +15,10 @@
 #include <QVariant>
 #include <QtGlobal>
 
-#if defined(QXlsx_SHAREDLIB)
-#    if defined(QXlsx_EXPORTS)
-#        define QXLSX_EXPORT Q_DECL_EXPORT
-#    else
-#        define QXLSX_EXPORT Q_DECL_IMPORT
-#    endif
+#if defined(AVM_EXPORTS)
+#    define QXLSX_EXPORT Q_DECL_EXPORT
+#elif defined(AVM_IMPORTS)
+#    define QXLSX_EXPORT Q_DECL_IMPORT
 #else
 #    define QXLSX_EXPORT
 #endif
