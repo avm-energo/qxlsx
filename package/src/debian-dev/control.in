@@ -1,0 +1,9 @@
+Source: avm-qxlsx-dev
+Priority: optional
+Maintainer: AVM-Energo <support@avmenergo.ru>
+Section: devel
+
+Package: avm-qxlsx-dev
+Description: QXlsx for AVM-Energo projects development files
+Architecture: amd64
+Depends: ${shlibs:Depends}

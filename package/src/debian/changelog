@@ -1,0 +1,6 @@
+avm-qxlsx (2.0.1) unstable; urgency=low
+
+  [*] ZipReader and ZipWriter moved to the avm-gen library
+  [!] forked from https://github.com/QtExcel/QXlsx
+
+ -- AVM-Energo <support@avmenergo.ru>  Fri, 13 Feb 2026 10:48:20 +0300

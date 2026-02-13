@@ -2,13 +2,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-<<<<<<< HEAD
-project(QXlsx
-    VERSION 2.0.0
-=======
 project(avm-qxlsx
     VERSION 2.0.1
->>>>>>> develop
     LANGUAGES CXX
 )
 
@@ -34,19 +29,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-if(NOT DEFINED QXLSX_PARENTPATH)
-	set(QXLSX_PARENTPATH ${CMAKE_CURRENT_SOURCE_DIR}/../)
+if(NOT DEFINED headers_path)
+        set(headers_path ${CMAKE_CURRENT_SOURCE_DIR}/../QXlsx/header/)
 endif()
 
-if(NOT DEFINED QXLSX_HEADERPATH)
-	set(QXLSX_HEADERPATH ${CMAKE_CURRENT_SOURCE_DIR}/../QXlsx/header/)
-endif()
-
-if(NOT DEFINED QXLSX_SOURCEPATH)
-	set(QXLSX_SOURCEPATH ${CMAKE_CURRENT_SOURCE_DIR}/../QXlsx/source/)
-endif()
-
-set(SRC_FILES
+set(source_files
     source/xlsxcellrange.cpp
     source/xlsxcellrange.cpp
     source/xlsxcontenttypes.cpp
@@ -112,7 +99,7 @@ set(SRC_FILES
     header/xlsxutility_p.h
 )
 
-set(QXLSX_PUBLIC_HEADERS
+set(public_headers
     header/xlsxabstractooxmlfile.h
     header/xlsxabstractsheet.h
     header/xlsxabstractsheet_p.h
@@ -134,7 +121,7 @@ set(QXLSX_PUBLIC_HEADERS
     header/xlsxworksheet.h
 )
 
-find_package(avm-gen QUIET)
+find_package(avm-gen 1.11.0 QUIET)
 if(${avm-gen_FOUND})
   message(STATUS "Found package avm-gen")
 else()
@@ -144,12 +131,12 @@ endif()
 # Library building settings
 if(BUILD_SHARED_LIBS)
     message(STATUS "${PROJECT_NAME} SHARED LIBRARY")
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${QXLSX_PUBLIC_HEADERS})
+    add_library(${PROJECT_NAME} SHARED ${source_files} ${public_headers})
     target_compile_definitions(${PROJECT_NAME} PRIVATE -DAVM_EXPORTS)
     target_compile_definitions(${PROJECT_NAME} INTERFACE -DAVM_IMPORTS)
 else()
     message(STATUS "${PROJECT_NAME} STATIC LIBRARY")
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${QXLSX_PUBLIC_HEADERS})
+    add_library(${PROJECT_NAME} STATIC ${source_files} ${public_headers})
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DHAVE_STATIC_BUILD)
 endif()
 
@@ -176,18 +163,7 @@ if (NOT WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE QT_STRICT_ITERATORS)
 endif()
 
-<<<<<<< HEAD
-target_compile_features(QXlsx INTERFACE cxx_std_11)
-
-if (BUILD_SHARED_LIBS)
-    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} has to be built as SHARED library")
-    target_compile_definitions(QXlsx PUBLIC QXlsx_SHAREDLIB)
-else()
-    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} STATIC library")
-endif()
-=======
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
->>>>>>> develop
 
 # Set project version as qxlsx target property
 target_link_libraries(${PROJECT_NAME}
@@ -198,7 +174,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
 PRIVATE
-    ${QXLSX_HEADERPATH}
+    ${headers_path}
 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/header>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -208,7 +184,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION 0.${PROJECT_VERSION}
-    PUBLIC_HEADER "${QXLSX_PUBLIC_HEADERS}"
+    PUBLIC_HEADER "${public_headers}"
 )
 
 install(TARGETS ${PROJECT_NAME}
@@ -244,5 +220,5 @@ install(
 )
 
 set(VERSION_IN ${CMAKE_CURRENT_SOURCE_DIR}/VERSION.in)
-set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/package/src/VERSION)
+set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/../package/src/VERSION)
 configure_file(${VERSION_IN} ${VERSION_OUT} @ONLY)
