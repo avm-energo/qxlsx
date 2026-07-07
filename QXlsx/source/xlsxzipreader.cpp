@@ -2,7 +2,7 @@
 
 #include "xlsxzipreader_p.h"
 
-#include <avm-gen/files/ziputil.h>
+#include <libavm-gen/files/ziputil.h>
 
 QT_BEGIN_NAMESPACE_XLSX
 

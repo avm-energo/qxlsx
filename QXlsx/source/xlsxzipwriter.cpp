@@ -2,7 +2,7 @@
 
 #include "xlsxzipwriter_p.h"
 
-#include <avm-gen/files/ziputil.h>
+#include <libavm-gen/files/ziputil.h>
 
 #include <QDebug>
 #include <QtGlobal>
