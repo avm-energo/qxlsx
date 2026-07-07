@@ -2,8 +2,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(avm-qxlsx
-    VERSION 2.0.1
+project(libavm-qxlsx
+    VERSION 3.0.0
     LANGUAGES CXX
 )
 
@@ -121,21 +121,21 @@ set(public_headers
     header/xlsxworksheet.h
 )
 
-find_package(avm-gen 1.11.0 QUIET)
-if(${avm-gen_FOUND})
-  message(STATUS "Found package avm-gen")
+find_package(libavm-gen 3.0.0 QUIET)
+if(${libavm-gen_FOUND})
+  message(STATUS "Found package libavm-gen")
 else()
   include(gen)
 endif()
 
 # Library building settings
 if(BUILD_SHARED_LIBS)
-    message(STATUS "${PROJECT_NAME} SHARED LIBRARY")
+    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} SHARED LIBRARY")
     add_library(${PROJECT_NAME} SHARED ${source_files} ${public_headers})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE -DAVM_EXPORTS)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE -DAVM_IMPORTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DQXLSX_EXPORTS)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE -DQXLSX_IMPORTS)
 else()
-    message(STATUS "${PROJECT_NAME} STATIC LIBRARY")
+    message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} STATIC LIBRARY")
     add_library(${PROJECT_NAME} STATIC ${source_files} ${public_headers})
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DHAVE_STATIC_BUILD)
 endif()
@@ -169,7 +169,7 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
 target_link_libraries(${PROJECT_NAME}
    Qt${QT_VERSION_MAJOR}::Core
    Qt${QT_VERSION_MAJOR}::Gui
-   avm-gen
+   libavm-gen
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -181,10 +181,10 @@ PUBLIC
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    OUTPUT_NAME ${PROJECT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION 0.${PROJECT_VERSION}
     PUBLIC_HEADER "${public_headers}"
+    PREFIX ""
 )
 
 install(TARGETS ${PROJECT_NAME}

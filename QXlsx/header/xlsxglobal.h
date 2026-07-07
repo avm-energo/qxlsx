@@ -15,9 +15,9 @@
 #include <QVariant>
 #include <QtGlobal>
 
-#if defined(AVM_EXPORTS)
+#if defined(QXLSX_EXPORTS)
 #    define QXLSX_EXPORT Q_DECL_EXPORT
-#elif defined(AVM_IMPORTS)
+#elif defined(QXLSX_IMPORTS)
 #    define QXLSX_EXPORT Q_DECL_IMPORT
 #else
 #    define QXLSX_EXPORT

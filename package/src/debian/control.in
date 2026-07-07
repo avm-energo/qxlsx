@@ -6,4 +6,4 @@ Section: devel
 Package: avm-qxlsx
 Description: QXlsx for AVM-Energo projects
 Architecture: amd64
-Depends: ${shlibs:Depends}, libavm-gen (>= 1.11.0)
+Depends: ${shlibs:Depends}, libavm-gen (>= 3.0.0)
